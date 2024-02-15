@@ -87,7 +87,7 @@ def getMethodsAndURIs():
 
 
 
-def getLocsPathsQueriesMethods():
+def getLPQM():
   methodsAndURIs = getMethodsAndURIs()
   
   finalDataStructure = []
@@ -114,38 +114,6 @@ def getLocsPathsQueriesMethods():
 
     addIntoLPQMStructure(finalDataStructure, method, parsed_url)
   return finalDataStructure
-
-'''
-def addIntoLPQMStructure(obj, method, parsed_url):
-  domain = parsed_url.netloc
-  path = parsed_url.path
-  qstring = parse_qs(parsed_url.query)
-  print(f"{method}, {domain}, {path}, {qstring}")
-  
-  domainExisted = False
-  # jokaiselle domainilla oma sublista
-  for domainObject in obj:
-    # domainobjekti oli jo olemassa, lisätään sinne
-    if domainObject[0] == domain:
-      domainExisted = True
-      pathExisted = False
-      # [domain, [polku1, metodi1, qparams1], [...]]
-      # käydään läpi kaikki jatko-objektit
-      for subObjectIndex in range(1, len(domainObject)):
-        subObj = domainObject[subObjectIndex]
-        # jos polku oli jo olemassa, niin...
-        if subObj[0] == path:
-          pathExisted = True
-          # ... huomautetaan, jos metodit eivät täsmää
-          if subObj[1] != method:
-            print("HUOM! Monta metodia samaan entpointtiin!")
-          #yhdistetään qstring objektit
-          subObj[2].update(qstring)
-      if not pathExisted:
-        domainObject.append([path, method, qstring])
-  if not domainExisted:
-    obj.append([domain, [path, method, qstring]])
-'''
 
 
 
