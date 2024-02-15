@@ -1,7 +1,7 @@
 from readjson import *
 from parserengine import *
 from urllib.parse import urlparse, parse_qs
-
+from lpqmtools import *
 
 """
 käytettävissä olevat palikat
@@ -115,7 +115,7 @@ def getLocsPathsQueriesMethods():
     addIntoLPQMStructure(finalDataStructure, method, parsed_url)
   return finalDataStructure
 
-
+'''
 def addIntoLPQMStructure(obj, method, parsed_url):
   domain = parsed_url.netloc
   path = parsed_url.path
@@ -145,7 +145,7 @@ def addIntoLPQMStructure(obj, method, parsed_url):
         domainObject.append([path, method, qstring])
   if not domainExisted:
     obj.append([domain, [path, method, qstring]])
-
+'''
 
 
 
