@@ -1,5 +1,6 @@
 from readjson import *
 from parserengine import *
+from urllib.parse import urlparse, parse_qs
 
 
 """
@@ -12,6 +13,7 @@ käytettävissä olevat palikat
 - pkt_preserveKeysAllSubstr(obj, matchList)
 - pkt_preserveSubstr(obj, matchList)
 - pkt_preserveSubstrAll(obj, matchList)
+- pkt_preserveEachSublistExactMatch(obj, matchList):
 
 ## Arvojennoutofunktiot
 - pkt_keyValuesByKeys(obj, keyList)
@@ -22,6 +24,8 @@ käytettävissä olevat palikat
 requestPath = ["http.request.uri", "http2.headers.path"]
 requestFullURI = ["http.request.full_uri", "http2.request.full_uri"]
 responseURI = ["http.response_for.uri"] # ei HTTP/2 -vastinetta
+
+methods = ["http.request.method", "http2.headers.method"]
 
 
 # sievennysfunktio, näyttää ei-mjonot tyyppeinä
@@ -61,5 +65,119 @@ def showUniqRequestPaths():
 
 
 
+#
+#  Full URI extraction
+#
+def getRequestURIs():
+  return pkt_keyValuesByKeys(pkt_data, requestFullURI)
 
+
+
+#
+# Full URI + methods
+#
+def getMethodsAndURIs():
+  returnList = []
+  URIsAndMethods = requestFullURI + methods
+
+  for packet in pkt_data:
+    if pkt_preserveKeysAny(packet, requestFullURI): # tämä riittää, koska integriteettitarkistukset
+      returnList.append(pkt_keyValuesByKeys(packet, requestFullURI+methods))
+  return returnList
+
+
+
+def getLocsPathsQueriesMethods():
+  methodsAndURIs = getMethodsAndURIs()
+  
+  finalDataStructure = []
+
+  #methods and URIs on lista listoja, jokainen ensimmäisen tason alilista vastaa yhtä pakettia.
+  for packet in methodsAndURIs:
+    #if len(packet) != 2:
+      #raise Exception("täysparsinnassa jotain hämärää")
+      # note to self: http2:ssa joskus ilmeisesti on monta resurssipyyntöä yhdessä.
+
+    
+    tStruct1 = packet[0]
+    tStruct2 = packet[1]
+
+    if not tStruct1[0] in methods:
+      print("järjestyspoikkeus")
+      tStruct1, tStruct2 = tStruct2, tStruct1
+
+    # tStruct1 on nyt varmuudella metodi ja 2 uri
+    method = tStruct1[1]
+    fullUri = tStruct2[1]
+
+    parsed_url = urlparse(fullUri)
+
+    addIntoLPQMStructure(finalDataStructure, method, parsed_url)
+  return finalDataStructure
+
+
+def addIntoLPQMStructure(obj, method, parsed_url):
+  domain = parsed_url.netloc
+  path = parsed_url.path
+  qstring = parse_qs(parsed_url.query)
+  print(f"{method}, {domain}, {path}, {qstring}")
+  
+  domainExisted = False
+  # jokaiselle domainilla oma sublista
+  for domainObject in obj:
+    # domainobjekti oli jo olemassa, lisätään sinne
+    if domainObject[0] == domain:
+      domainExisted = True
+      pathExisted = False
+      # [domain, [polku1, metodi1, qparams1], [...]]
+      # käydään läpi kaikki jatko-objektit
+      for subObjectIndex in range(1, len(domainObject)):
+        subObj = domainObject[subObjectIndex]
+        # jos polku oli jo olemassa, niin...
+        if subObj[0] == path:
+          pathExisted = True
+          # ... huomautetaan, jos metodit eivät täsmää
+          if subObj[1] != method:
+            print("HUOM! Monta metodia samaan entpointtiin!")
+          #yhdistetään qstring objektit
+          subObj[2].update(qstring)
+      if not pathExisted:
+        domainObject.append([path, method, qstring])
+  if not domainExisted:
+    obj.append([domain, [path, method, qstring]])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#
+# dataintegriteetin ja toimintalogiikan oikeellisuuden automaattiset tarkistus-
+# funktiot.
+requestFullURI, methods
+def ensureFullURIsHaveMethods():
+  for packet in pkt_data:
+    foundFullURI = pkt_preserveKeysAny(packet, requestFullURI)
+    foundMethods = pkt_preserveKeysAny(packet, methods)
+    if foundFullURI and not foundMethods:
+      raise Exception("Full-URI match ilman methodia. ")
+
+automatic_tests = [
+  ensureFullURIsHaveMethods
+]
+
+for test in automatic_tests:
+  test()
 

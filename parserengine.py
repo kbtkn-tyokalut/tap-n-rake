@@ -133,6 +133,16 @@ def pkt_preserveSubstrAll(obj, matchList):
 
 
 
+# Ottaa listan listoja. Jokaisesta listasta täytyy löytyä ainakin yksi matchi
+# paketin headereista, jotta säilytetään.
+def pkt_preserveEachSublistExactMatch(obj, matchList):
+  for matchable in matchList:
+    if not pkt_preserveKeysAny(obj, matchable):
+      return False
+  return True
+
+
+
 # Tämä funktio toteuttaa luonnollisen kielen lauseen
 # ""Palauta paketilta kaikkien näiden avainten avain-arvo parit"".
 # avain-arvo parit ovat tupleina, arvo palautetaan as-is vaikka se
