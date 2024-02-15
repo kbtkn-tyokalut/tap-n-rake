@@ -1,0 +1,33 @@
+{
+ "http2.header": {
+              "http2.header.name.length": "16",
+              "http2.header.name": "content-encoding",
+              "http2.header.value.length": "4",
+              "http2.header.value": "gzip",
+              "http2.headers.content_encoding": "gzip",
+              "http2.header.unescaped": "gzip",
+              "http2.header.repr": "Indexed Header Field",
+              "http2.header.index": "71"
+            },
+"http2.header": {
+              "http2.header.name.length": "13",
+              "http2.header.name": "accept-ranges",
+              "http2.header.value.length": "5",
+              "http2.header.value": "bytes",
+              "http2.headers.accept_ranges": "bytes",
+              "http2.header.unescaped": "bytes",
+              "http2.header.repr": "Indexed Header Field",
+              "http2.header.index": "70"
+            },
+"http2.header": {
+              "http2.header.name.length": "3",
+              "http2.header.name": "age",
+              "http2.header.value.length": "6",
+              "http2.header.value": "569580",
+              "http2.headers.age": "569580",
+              "http2.header.unescaped": "569580",
+              "http2.header.repr": "Literal Header Field without Indexing - Indexed Name",
+              "http2.header.index": "21"
+            }
+}
+
